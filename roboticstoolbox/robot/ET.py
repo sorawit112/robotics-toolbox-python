@@ -29,7 +29,7 @@ try:  # pragma: no cover
     import sympy
 
     # Sym = sympy.Expr
-    Sym = sympy.core.symbol.Symbol
+    Sym = sympy.Symbol
 
 except ImportError:  # pragma: no cover
     Sym = float
