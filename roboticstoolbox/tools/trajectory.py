@@ -50,7 +50,7 @@ class Trajectory:
         .. note:: Data is stored with timesteps as rows and axes as columns.
         """
         self.name = name
-        self.t = t
+        self._t = t
         self.s = s
         self.sd = sd
         self.sdd = sdd
@@ -111,18 +111,18 @@ class Trajectory:
         """
         return self.sdd
 
-    # @property
-    # def t(self):
-    #     """
-    #     Trajectory time
+    @property
+    def t(self):
+        """
+        Trajectory time
 
-    #     :return: trajectory time vector
-    #     :rtype: ndarray(n)
+        :return: trajectory time vector
+        :rtype: ndarray(n)
 
-    #     .. note:: This is a synonym for ``.t``, for compatibility with other
-    #         applications.
-    #     """
-    #     return self.x
+        .. note:: This is a synonym for ``.t``, for compatibility with other
+            applications.
+        """
+        return self._t
 
     @property
     def naxes(self):
@@ -722,10 +722,6 @@ def ctraj(T0, T1, t=None, s=None):
         raise TypeError("bad argument for time, must be int or vector")
 
     return T0.interp(T1, s)
-
-
-def cmstraj():
-    pass
 
 
 # -------------------------------------------------------------------------- #
