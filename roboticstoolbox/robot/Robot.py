@@ -1621,7 +1621,10 @@ class Robot(SceneNode, ABC, DynamicsMixin, IKMixin):
 
         # Keep the plot open
         if block:  # pragma: no cover
-            env.hold()
+            try:
+                env.hold()
+            except:
+                pass
 
         return env
 
