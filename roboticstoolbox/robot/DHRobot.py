@@ -1823,9 +1823,9 @@ class DHRobot(Robot):
 
                 # The spherical wrist implements Euler angles
                 if "f" in config:
-                    eul = R.eul(flip=True)
-                else:
                     eul = R.eul()
+                else:
+                    eul = R.eul(flip=True)
                 theta = np.r_[theta, eul]
                 if self.links[3].alpha > 0:
                     theta[4] = -theta[4]
