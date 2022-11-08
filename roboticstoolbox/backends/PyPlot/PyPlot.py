@@ -390,9 +390,9 @@ class PyPlot(Connector):
 
         if _pil is None:
             try:
-                import PIL
+                from PIL import Image
 
-                _pil = PIL.Image.frombytes
+                _pil = Image.frombytes
             except ImportError:  # pragma nocover
                 pass
 
