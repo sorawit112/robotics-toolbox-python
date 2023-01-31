@@ -1042,6 +1042,17 @@ class DHRobot(Robot):
             Tj *= L.A(q)
             Tall.append(Tj)
         return Tall
+    
+    def inv_jacob0(self, q, v_end):
+        
+        # J_end_linear = self.jacobian[-1].evalf(subs=qs_dict)[0:3,0:6]
+        j_end = self.jacob0(q)
+        
+        J_end_inv = np.linalg.pinv(j_end)
+        
+        dq = np.matmul(J_end_inv, v_end)
+        
+        return dq
 
     def jacobe(self, q, half=None, **kwargs):
         r"""
