@@ -18,6 +18,7 @@ class RobotPlot:
         jointaxes=True,
         jointlabels=False,
         eeframe=True,
+        toolframe=True,
         shadow=True,
         name=True,
         options=None,
@@ -50,12 +51,15 @@ class RobotPlot:
 
         # Coordinate frame of the ee (three quivers)
         self.ee_axes = []
+        
+        self.tool_axes = []
 
         # Robot has been drawn
         self.drawn = False
 
         # Display options
         self.eeframe = eeframe
+        self.toolframe = toolframe
         self.jointaxes = jointaxes
         self.jointlabels = jointlabels
         self.shadow = shadow
@@ -70,7 +74,8 @@ class RobotPlot:
             "eex": {"color": "#F84752", "linewidth": 2},  # '#EE9494'
             "eey": {"color": "#BADA55", "linewidth": 2},  # '#93E7B0'
             "eez": {"color": "#54AEFF", "linewidth": 2},
-            "eelength": 0.06,
+            "eelength": 0.03,
+            "toollength" : 0.06
         }
 
         if options is not None:
@@ -90,7 +95,8 @@ class RobotPlot:
 
         # compute all link frames
         T = self.robot.fkine_all(self.robot.q)
-
+        
+        
         # draw all the line segments for the noodle plot
         for i, segment in enumerate(self.segments):
             linkframes = []
@@ -99,6 +105,11 @@ class RobotPlot:
                     linkframes.append(self.robot.base)
                 else:
                     linkframes.append(T[link.number])
+                    
+            if self.toolframe:
+                T_tool = T[segment[-1].number]*self.robot.tool
+                linkframes.append(T_tool)
+                    
             points = np.array([linkframe.t for linkframe in linkframes])
 
             self.links[i].set_xdata(points[:, 0])
@@ -110,7 +121,7 @@ class RobotPlot:
                 self.sh_links[i].set_xdata(points[:, 0])
                 self.sh_links[i].set_ydata(points[:, 1])
                 self.sh_links[i].set_3d_properties(0)
-
+                
         ## Draw the end-effector coordinate frames
 
         # remove old ee coordinate frame
@@ -141,6 +152,30 @@ class RobotPlot:
                 zaxis = self._plot_quiver(Te.t, Tez.t, self.options["eez"])
 
                 self.eeframes.extend([xaxis, yaxis, zaxis])
+        
+        if self.toolframes:
+            for quiver in self.toolframes:
+                quiver.remove()
+
+            self.toolframes = []
+        
+        if self.toolframe:
+            # Axes arrow transforms
+            len = self.options["toollength"]
+            Tjx = SE3([len, 0, 0])
+            Tjy = SE3([0, len, 0])
+            Tjz = SE3([0, 0, len])
+
+            # ee axes arrows
+            Tex = T_tool * Tjx
+            Tey = T_tool * Tjy
+            Tez = T_tool * Tjz
+
+            xaxis = self._plot_quiver(T_tool.t, Tex.t, self.options["eex"])
+            yaxis = self._plot_quiver(T_tool.t, Tey.t, self.options["eey"])
+            zaxis = self._plot_quiver(T_tool.t, Tez.t, self.options["eez"])
+
+            self.toolframes.extend([xaxis, yaxis, zaxis])
 
         ## Joint axes
 
@@ -214,6 +249,7 @@ class RobotPlot:
             self.links.append(line)
 
         self.eeframes = []
+        self.toolframes = []
         self.joints = []
 
     def _plot_quiver(self, p0, p1, options):
